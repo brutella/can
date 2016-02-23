@@ -64,6 +64,7 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 	return &readWriteCloser{f}, nil
 }
 
+// NewReadWriteCloser returns a ReadWriteCloser for an `io.ReadWriteCloser`.
 func NewReadWriteCloser(rwc io.ReadWriteCloser) ReadWriteCloser {
 	return &readWriteCloser{rwc}
 }

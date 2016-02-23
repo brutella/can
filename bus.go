@@ -35,7 +35,7 @@ func (b *Bus) ConnectAndPublish() error {
 	return nil
 }
 
-// Disconnects stops handling CAN frames.
+// Disconnect stops handling CAN frames.
 func (b *Bus) Disconnect() error {
 	return b.rwc.Close()
 }
@@ -45,12 +45,13 @@ func (b *Bus) Subscribe(handler Handler) {
 	b.handler = append(b.handler, handler)
 }
 
+// SubscribeFunc adds a function as handler.
 func (b *Bus) SubscribeFunc(fn HandlerFunc) {
 	handler := NewHandler(fn)
 	b.Subscribe(handler)
 }
 
-// Unsubscribes removes a handler from the bus.
+// Unsubscribe removes a handler.
 func (b *Bus) Unsubscribe(handler Handler) {
 	for i, h := range b.handler {
 		if h == handler {
@@ -85,9 +86,9 @@ func (b *Bus) publishNextFrame() error {
 
 		if err != io.EOF { // EOF is not an error, it happens when calling rwc.Close()
 			return err
-		} else {
-			return nil
 		}
+
+		return nil
 	}
 
 	b.publish(frame)

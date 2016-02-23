@@ -1,18 +1,22 @@
-// Package can provides a CAN bus to send and receive CAN frames.
+// Package can provides an implemention of a CAN bus to send and receive CAN frames.
 package can
 
 const (
-	MaskID    = 0x000007FF // 11-bit identifier
-	MaskIDEff = 0x1FFFFFFF // 29-bit identifier
+	// MaskIDSff is used to extract the valid 11-bit CAN identifier bits from the frame ID of a standard frame format.
+	MaskIDSff = 0x000007FF
+	// MaskIDEff is used to extract the valid 29-bit CAN identifier bits from the frame ID of an extended frame format.
+	MaskIDEff = 0x1FFFFFFF
+	// MaskErr is used to extract the the error flag (0 = data frame, 1 = error message) from the frame ID.
+	MaskErr = 0x20000000
+	// MaskRtr is used to extract the rtr flag (1 = rtr frame) from the frame ID
+	MaskRtr = 0x40000000
+	// MaskEff is used to extract the eff flag (0 = standard frame, 1 = extended frame) from the frame ID
+	MaskEff = 0x80000000
 )
 
 const (
-	FlagErr = 0x20000000 // 0 = data frame, 1 = error message
-	FlagRtr = 0x40000000 // 1 = rtr frame
-	FlagEff = 0x80000000 // 0 = standard 11 bit, 1 = extended 29 bit
-)
-
-const (
-	MaxFrameDataLength    = 8  // ISO 11898-1
-	MaxExtFrameDataLength = 64 // ISO 11898-7
+	// MaxFrameDataLength defines the max length of a CAN data frame defined in ISO 11898-1.
+	MaxFrameDataLength = 8
+	// MaxExtFrameDataLength defines the max length of an CAN extended data frame defined in ISO ISO 11898-7.
+	MaxExtFrameDataLength = 64
 )

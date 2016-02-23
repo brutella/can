@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// A WaitResponse encapsulates the response of waiting for a frame.
 type WaitResponse struct {
 	Frame Frame
 	Err   error
