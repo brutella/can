@@ -2,11 +2,11 @@
 
 *can* provides an interface to a [CAN bus](https://www.kernel.org/doc/Documentation/networking/can.txt) to read and write frames. The library is based on the [SocketCAN](https://github.com/torvalds/linux/blob/097f70b3c4d84ffccca15195bdfde3a37c0a7c0f/include/uapi/linux/can.h) network stack on Linux.
 
-## Hardware
+# Hardware
 
 I'm using a [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) and [PiCAN2 CAN-Bus board for Raspberry Pi 2](http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-2-p-1475.html) to connect to a CAN bus.
 
-## Software
+# Software
 
 The Raspberry Pi runs [Raspbian](https://www.raspberrypi.org/downloads/raspbian/). After connecting to the CAN bus you have to set up the can network interface for a specific bitrate, i.e. 50 kB
 
@@ -56,3 +56,16 @@ Either way you will see something like this
     func handleCANFrame(frm can.Frame) {    
         ...
     }
+
+# Contact
+
+Matthias Hochgatterer
+
+Github: [https://github.com/brutella](https://github.com/brutella/)
+
+Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
+
+
+# License
+
+*can* is available under the MIT license. See the LICENSE file for more info.
