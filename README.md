@@ -57,6 +57,8 @@ Either way you will see something like this
         ...
     }
 
+There is more to learn from the [documentation](http://godoc.org/github.com/brutella/can).
+
 # Contact
 
 Matthias Hochgatterer
