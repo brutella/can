@@ -30,11 +30,7 @@ Either way you will see something like this
 #### Setup the CAN bus
 
 ```go
-iface, _ := net.InterfaceByName("can0")
-
-conn, _ := can.NewReadWriteCloserForInterface(iface)
-
-bus := can.NewBus(conn)
+bus, _ := can.NewBusForInterfaceWithName("can0")
 bus.ConnectAndPublish()
 ```
 

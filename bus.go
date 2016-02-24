@@ -2,6 +2,7 @@ package can
 
 import (
 	"io"
+	"net"
 	"time"
 )
 
@@ -12,6 +13,21 @@ type Bus struct {
 	rwc ReadWriteCloser
 
 	handler []Handler
+}
+
+// NewBusForInterfaceWithName returns a bus from the network interface with name ifaceName.
+func NewBusForInterfaceWithName(ifaceName string) (*Bus, error) {
+	iface, err := net.InterfaceByName(ifaceName)
+	if err != nil {
+		return nil, err
+	}
+
+	conn, err := NewReadWriteCloserForInterface(iface)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewBus(conn), nil
 }
 
 // NewBus returns a new CAN bus.
