@@ -6,7 +6,7 @@
 
 I'm using a [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) and [PiCAN2 CAN-Bus board for Raspberry Pi 2](http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-2-p-1475.html) to connect to a CAN bus.
 
-# Software
+# Configuration
 
 The Raspberry Pi runs [Raspbian](https://www.raspberrypi.org/downloads/raspbian/). After connecting to the CAN bus you have to set up the can network interface for a specific bitrate, i.e. 50 kB
 
@@ -14,7 +14,7 @@ The Raspberry Pi runs [Raspbian](https://www.raspberrypi.org/downloads/raspbian/
 
 Running `ifconfig` should now include the `can0` interface. 
 
-#### Testing
+#### Test your configuration
 
 You should test if you actually receive data from the CAN bus. You can either use the `candump` tool from the [can-utils](https://github.com/linux-can/can-utils) or a simple reimplementation under `cmd/candump.go`. 
 
@@ -29,33 +29,39 @@ Either way you will see something like this
 
 #### Setup the CAN bus
 
-    iface, _ := net.InterfaceByName("can0")
-    
-    conn, _ := can.NewReadWriteCloserForInterface(iface)
-    
-    bus := can.NewBus(conn)
-    bus.ConnectAndPublish()
+```go
+iface, _ := net.InterfaceByName("can0")
+
+conn, _ := can.NewReadWriteCloserForInterface(iface)
+
+bus := can.NewBus(conn)
+bus.ConnectAndPublish()
+```
 
 #### Send a CAN frame
 
-	frm := Frame{
-		ID:     0x701,
-		Length: 1,
-		Flags:  0,
-		Res0:   0,
-		Res1:   0,
-		Data:   [8]uint8{0x05},
-	}
-    
-    bus.Publish(frm)
+```go
+frm := Frame{
+	ID:     0x701,
+	Length: 1,
+	Flags:  0,
+	Res0:   0,
+	Res1:   0,
+	Data:   [8]uint8{0x05},
+}
+
+bus.Publish(frm)
+```
     
 #### Receive a CAN frame
 
-	bus.SubscribeFunc(handleCANFrame)
-    
-    func handleCANFrame(frm can.Frame) {    
-        ...
-    }
+```go
+bus.SubscribeFunc(handleCANFrame)
+
+func handleCANFrame(frm can.Frame) {    
+    ...
+}
+```
 
 There is more to learn from the [documentation](http://godoc.org/github.com/brutella/can).
 
