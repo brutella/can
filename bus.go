@@ -3,7 +3,6 @@ package can
 import (
 	"io"
 	"net"
-	"time"
 )
 
 // Bus represents the CAN bus.
@@ -45,7 +44,6 @@ func (b *Bus) ConnectAndPublish() error {
 		if err != nil {
 			return err
 		}
-		<-time.After(time.Millisecond * 10)
 	}
 
 	return nil
