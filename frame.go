@@ -3,6 +3,7 @@ package can
 import (
 	"bytes"
 	"encoding/binary"
+	"syscall"
 )
 
 // Frame represents a standard CAN data frame
@@ -17,6 +18,7 @@ type Frame struct {
 	Res0   uint8
 	Res1   uint8
 	Data   [MaxFrameDataLength]uint8
+	Time   syscall.Timeval
 }
 
 // Marshal returns the byte encoding of frm.

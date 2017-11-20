@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"syscall"
+	"unsafe"
 )
 
 // The Reader interface extends the `io.Reader` interface by method
@@ -43,6 +44,7 @@ const (
 
 type readWriteCloser struct {
 	rwc io.ReadWriteCloser
+	s   int
 }
 
 // NewReadWriteCloserForInterface returns a ReadWriteCloser for a network interface.
@@ -61,12 +63,20 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 
 	f := os.NewFile(uintptr(s), fmt.Sprintf("fd %d", s))
 
-	return &readWriteCloser{f}, nil
+	return &readWriteCloser{f, s}, nil
 }
 
 // NewReadWriteCloser returns a ReadWriteCloser for an `io.ReadWriteCloser`.
 func NewReadWriteCloser(rwc io.ReadWriteCloser) ReadWriteCloser {
-	return &readWriteCloser{rwc}
+	return &readWriteCloser{rwc, 0}
+}
+
+// try to get timestamp via ioctl SIOCGSTAMP request
+func (rwc *readWriteCloser) setTimestamp(frame *Frame) {
+	fd := uintptr(rwc.s)
+	req := uintptr(syscall.SIOCGSTAMP)
+	arg := uintptr(unsafe.Pointer(&frame.Time))
+	syscall.Syscall(syscall.SYS_IOCTL, fd, req, arg)
 }
 
 func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
@@ -76,6 +86,8 @@ func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
 	if err != nil {
 		return err
 	}
+
+	rwc.setTimestamp(frame)
 
 	err = Unmarshal(b[:n], frame)
 
