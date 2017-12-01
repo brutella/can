@@ -52,6 +52,16 @@ func Unmarshal(b []byte, frm *Frame) (err error) {
 	return cr.err
 }
 
+func UnmarshalTimestamp(b []byte, frm *Frame) (err error) {
+	cr := &errReader{
+		buf: bytes.NewBuffer(b),
+	}
+
+	cr.read(&frm.Time)
+
+	return cr.err
+}
+
 type errReader struct {
 	buf *bytes.Buffer
 	err error

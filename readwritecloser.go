@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"syscall"
-	"unsafe"
 )
 
 // The Reader interface extends the `io.Reader` interface by method
@@ -61,6 +60,10 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 		return nil, err
 	}
 
+	if err := syscall.SetsockoptInt(s, syscall.SOL_SOCKET, syscall.SO_TIMESTAMP, 1); err != nil {
+		return nil, err
+	}
+
 	f := os.NewFile(uintptr(s), fmt.Sprintf("fd %d", s))
 
 	return &readWriteCloser{f, s}, nil
@@ -68,26 +71,34 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 
 // NewReadWriteCloser returns a ReadWriteCloser for an `io.ReadWriteCloser`.
 func NewReadWriteCloser(rwc io.ReadWriteCloser) ReadWriteCloser {
-	return &readWriteCloser{rwc, 0}
-}
-
-// try to get timestamp via ioctl SIOCGSTAMP request
-func (rwc *readWriteCloser) setTimestamp(frame *Frame) {
-	fd := uintptr(rwc.s)
-	req := uintptr(syscall.SIOCGSTAMP)
-	arg := uintptr(unsafe.Pointer(&frame.Time))
-	syscall.Syscall(syscall.SYS_IOCTL, fd, req, arg)
+	return &readWriteCloser{rwc, -1}
 }
 
 func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
 	b := make([]byte, 256) // TODO(brutella) optimize size
-	n, err := rwc.Read(b)
+	oob := make([]byte, 32)
 
+	n, _, _, _, err := syscall.Recvmsg(rwc.s, b, oob, syscall.MSG_OOB)
+
+	// ignore "address family not supported by protocol"
+	if err == syscall.EAFNOSUPPORT {
+		err = nil
+	}
+
+	cms, err := syscall.ParseSocketControlMessage(oob)
 	if err != nil {
 		return err
 	}
 
-	rwc.setTimestamp(frame)
+	for _, cm := range cms {
+		if cm.Header.Level == syscall.SOL_SOCKET && cm.Header.Type == syscall.SO_TIMESTAMP {
+			UnmarshalTimestamp(cm.Data, frame)
+		}
+	}
+
+	if err != nil {
+		return err
+	}
 
 	err = Unmarshal(b[:n], frame)
 
