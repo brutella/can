@@ -49,7 +49,7 @@ bus.ConnectAndPublish()
 #### Send a CAN frame
 
 ```go
-frm := Frame{
+frm := can.Frame{
 	ID:     0x701,
 	Length: 1,
 	Flags:  0,
