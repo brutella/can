@@ -6,9 +6,21 @@
 
 I'm using a [Raspberry Pi 2 Model B](https://www.raspberrypi.org/products/raspberry-pi-2-model-b/) and [PiCAN2 CAN-Bus board for Raspberry Pi 2](http://skpang.co.uk/catalog/pican2-canbus-board-for-raspberry-pi-2-p-1475.html) to connect to a CAN bus.
 
+# Software
+
+The Raspberry Pi runs [Raspbian](https://www.raspberrypi.org/downloads/raspbian/). 
+
 # Configuration
 
-The Raspberry Pi runs [Raspbian](https://www.raspberrypi.org/downloads/raspbian/). After connecting to the CAN bus you have to set up the can network interface for a specific bitrate, i.e. 50 kB
+Update `/boot/config.txt` with
+
+    dtparam=spi=on 
+    dtoverlay=mcp2515-can0-overlay,oscillator=16000000,interrupt=25 
+    dtoverlay=spi-bcm2835-overlay
+
+and reboot.
+
+After phyiscally connecting to the CAN bus, you have to set up the can network interface for a specific bitrate, i.e. 50 kB
 
     sudo ip link set can0 up type can bitrate 50000
 
@@ -37,7 +49,7 @@ bus.ConnectAndPublish()
 #### Send a CAN frame
 
 ```go
-frm := Frame{
+frm := can.Frame{
 	ID:     0x701,
 	Length: 1,
 	Flags:  0,
