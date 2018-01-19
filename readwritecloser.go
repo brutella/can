@@ -76,16 +76,16 @@ func NewReadWriteCloser(rwc io.ReadWriteCloser) ReadWriteCloser {
 
 func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
 	b := make([]byte, 256) // TODO(brutella) optimize size
-	oob := make([]byte, 32)
+	oob := make([]byte, 64)
 
-	n, _, _, _, err := syscall.Recvmsg(rwc.s, b, oob, syscall.MSG_OOB)
+	n, oobn, _, _, err := syscall.Recvmsg(rwc.s, b, oob, syscall.MSG_OOB)
 
 	// ignore "address family not supported by protocol"
 	if err == syscall.EAFNOSUPPORT {
 		err = nil
 	}
 
-	cms, err := syscall.ParseSocketControlMessage(oob)
+	cms, err := syscall.ParseSocketControlMessage(oob[:oobn])
 	if err != nil {
 		return err
 	}
