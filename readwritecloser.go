@@ -85,6 +85,10 @@ func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
 		err = nil
 	}
 
+	if err != nil {
+		return err
+	}
+
 	cms, err := syscall.ParseSocketControlMessage(oob[:oobn])
 	if err != nil {
 		return err
