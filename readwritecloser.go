@@ -70,8 +70,8 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 }
 
 // NewReadWriteCloser returns a ReadWriteCloser for an `io.ReadWriteCloser`.
-func NewReadWriteCloser(rwc io.ReadWriteCloser) ReadWriteCloser {
-	return &readWriteCloser{rwc, -1}
+func NewReadWriteCloser(rwc io.ReadWriteCloser, readsocket int) ReadWriteCloser {
+	return &readWriteCloser{rwc, readsocket}
 }
 
 func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
