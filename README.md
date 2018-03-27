@@ -1,3 +1,5 @@
+This is a fork from [github.com/brutella/can](https://github.com/brutella/can).
+
 # can
 
 *can* provides an interface to a [CAN bus](https://www.kernel.org/doc/Documentation/networking/can.txt) to read and write frames. The library is based on the [SocketCAN](https://github.com/torvalds/linux/blob/097f70b3c4d84ffccca15195bdfde3a37c0a7c0f/include/uapi/linux/can.h) network stack on Linux.
@@ -20,7 +22,7 @@ You should test if you actually receive data from the CAN bus. You can either us
 
 Either way you will see something like this
 
-    > go run $GOSRC/github.com/brutella/can/cmd/candump.go -if can0
+    > go run $GOSRC/github.com/ast-dd/can/cmd/candump.go -if can0
     
     can0 100  [6] 20 83 0C 00 67 29        ' ...g)'
     can0 701  [1] 05                       '.'
@@ -59,15 +61,7 @@ func handleCANFrame(frm can.Frame) {
 }
 ```
 
-There is more to learn from the [documentation](http://godoc.org/github.com/brutella/can).
-
-# Contact
-
-Matthias Hochgatterer
-
-Github: [https://github.com/brutella](https://github.com/brutella/)
-
-Twitter: [https://twitter.com/brutella](https://twitter.com/brutella)
+There is more to learn from the [documentation](http://godoc.org/github.com/ast-dd/can).
 
 
 # License
