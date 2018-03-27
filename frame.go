@@ -52,6 +52,8 @@ func Unmarshal(b []byte, frm *Frame) (err error) {
 	return cr.err
 }
 
+// UnmarshalTimestamp parses the bytes b and stores the timestamp in the value
+// pointed to by frm.
 func UnmarshalTimestamp(b []byte, frm *Frame) (err error) {
 	cr := &errReader{
 		buf: bytes.NewBuffer(b),
