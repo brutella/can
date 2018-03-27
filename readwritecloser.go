@@ -42,7 +42,8 @@ const (
 )
 
 type readWriteCloser struct {
-	rwc io.ReadWriteCloser
+	rwc        io.ReadWriteCloser
+	readSocket int
 }
 
 // NewReadWriteCloserForInterface returns a ReadWriteCloser for a network interface.
@@ -59,19 +60,45 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 		return nil, err
 	}
 
+	if err := syscall.SetsockoptInt(s, syscall.SOL_SOCKET, syscall.SO_TIMESTAMP, 1); err != nil {
+		return nil, err
+	}
+
 	f := os.NewFile(uintptr(s), fmt.Sprintf("fd %d", s))
 
-	return &readWriteCloser{f}, nil
+	return &readWriteCloser{f, s}, nil
 }
 
 // NewReadWriteCloser returns a ReadWriteCloser for an `io.ReadWriteCloser`.
-func NewReadWriteCloser(rwc io.ReadWriteCloser) ReadWriteCloser {
-	return &readWriteCloser{rwc}
+func NewReadWriteCloser(rwc io.ReadWriteCloser, readsocket int) ReadWriteCloser {
+	return &readWriteCloser{rwc, readsocket}
 }
 
 func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
 	b := make([]byte, 256) // TODO(brutella) optimize size
-	n, err := rwc.Read(b)
+	oob := make([]byte, 64)
+
+	n, oobn, _, _, err := syscall.Recvmsg(rwc.readSocket, b, oob, 0)
+
+	// ignore "address family not supported by protocol"
+	if err == syscall.EAFNOSUPPORT {
+		err = nil
+	}
+
+	if err != nil {
+		return err
+	}
+
+	cms, err := syscall.ParseSocketControlMessage(oob[:oobn])
+	if err != nil {
+		return err
+	}
+
+	for _, cm := range cms {
+		if cm.Header.Level == syscall.SOL_SOCKET && cm.Header.Type == syscall.SO_TIMESTAMP {
+			UnmarshalTimestamp(cm.Data, frame)
+		}
+	}
 
 	if err != nil {
 		return err

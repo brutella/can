@@ -6,7 +6,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/brutella/can"
+	"github.com/ast-dd/can"
 	"log"
 	"net"
 	"os"

@@ -3,6 +3,7 @@ package can
 import (
 	"bytes"
 	"encoding/binary"
+	"syscall"
 )
 
 // Frame represents a standard CAN data frame
@@ -17,6 +18,7 @@ type Frame struct {
 	Res0   uint8
 	Res1   uint8
 	Data   [MaxFrameDataLength]uint8
+	Time   syscall.Timeval
 }
 
 // Marshal returns the byte encoding of frm.
@@ -46,6 +48,18 @@ func Unmarshal(b []byte, frm *Frame) (err error) {
 	cr.read(&frm.Res0)
 	cr.read(&frm.Res1)
 	cr.read(&frm.Data)
+
+	return cr.err
+}
+
+// UnmarshalTimestamp parses the bytes b and stores the timestamp in the value
+// pointed to by frm.
+func UnmarshalTimestamp(b []byte, frm *Frame) (err error) {
+	cr := &errReader{
+		buf: bytes.NewBuffer(b),
+	}
+
+	cr.read(&frm.Time)
 
 	return cr.err
 }
