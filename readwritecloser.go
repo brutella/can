@@ -42,8 +42,8 @@ const (
 )
 
 type readWriteCloser struct {
-	rwc io.ReadWriteCloser
-	s   int
+	rwc        io.ReadWriteCloser
+	readSocket int
 }
 
 // NewReadWriteCloserForInterface returns a ReadWriteCloser for a network interface.
@@ -78,7 +78,7 @@ func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
 	b := make([]byte, 256) // TODO(brutella) optimize size
 	oob := make([]byte, 64)
 
-	n, oobn, _, _, err := syscall.Recvmsg(rwc.s, b, oob, syscall.MSG_OOB)
+	n, oobn, _, _, err := syscall.Recvmsg(rwc.readSocket, b, oob, 0)
 
 	// ignore "address family not supported by protocol"
 	if err == syscall.EAFNOSUPPORT {
