@@ -5,6 +5,11 @@ import (
 	"encoding/binary"
 )
 
+type FrameInterface interface {
+	Marshal(frm Frame) (b []byte, err error)
+	Unmarshal(b []byte, frm *Frame) (err error)
+}
+
 // Frame represents a standard CAN data frame
 type Frame struct {
 	// bit 0-28: CAN identifier (11/29 bit)
@@ -20,6 +25,22 @@ type Frame struct {
 }
 
 // Marshal returns the byte encoding of frm.
+func (frm *Frame) Marshal() (b []byte, err error) {
+	wr := errWriter{
+		buf: bytes.NewBuffer([]byte{}),
+	}
+	wr.write(frm.ID)
+	wr.write(frm.Length)
+	wr.write(frm.Flags)
+	wr.write(frm.Res0)
+	wr.write(frm.Res1)
+	wr.write(frm.Data)
+
+	return wr.buf.Bytes(), wr.err
+}
+
+// ensure backward compatibility
+// Marshal returns the byte encoding of frm.
 func Marshal(frm Frame) (b []byte, err error) {
 	wr := errWriter{
 		buf: bytes.NewBuffer([]byte{}),
@@ -34,6 +55,23 @@ func Marshal(frm Frame) (b []byte, err error) {
 	return wr.buf.Bytes(), wr.err
 }
 
+// Unmarshal parses the bytes b and stores the result in the value
+// pointed to by frm.
+func (frm *Frame) Unmarshal(b []byte) (err error) {
+	cr := &errReader{
+		buf: bytes.NewBuffer(b),
+	}
+	cr.read(frm.ID)
+	cr.read(frm.Length)
+	cr.read(frm.Flags)
+	cr.read(frm.Res0)
+	cr.read(frm.Res1)
+	cr.read(frm.Data)
+
+	return cr.err
+}
+
+// ensure backward compatibility
 // Unmarshal parses the bytes b and stores the result in the value
 // pointed to by frm.
 func Unmarshal(b []byte, frm *Frame) (err error) {

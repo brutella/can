@@ -5,6 +5,15 @@ import (
 	"net"
 )
 
+type BusInterface interface {
+	ConnectAndPublish() error
+	Disconnect() error
+	Subscribe(handler Handler)
+	SubscribeFunc(fn HandlerFunc)
+	Unsubscribe(handler Handler)
+	Publish(frame Frame) error
+}
+
 // Bus represents the CAN bus.
 // Handlers can subscribe to receive frames.
 // Frame are sent using the *Publish* method.
