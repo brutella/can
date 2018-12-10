@@ -3,24 +3,16 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
-BINARY_NAME=candump
-BUILD_DIR=build
-BUILD_SRC=cmd/candump.go
-PACKAGE_RPI=$(BINARY_NAME)_linux_armhf
 
-all: test build
-build:
-	$(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME) -i $(BUILD_SRC)
+VERSION=$(shell git describe --exact-match --tags 2>/dev/null)
+BUILD_DIR=build
+PACKAGE_RPI=candump-$(VERSION)_linux_armhf
 
 test:
 	$(GOTEST) -v ./...
 
-clean:
-	$(GOCLEAN)
-	rm -rf $(BINARY_NAME)
-
 package-rpi: build-rpi
-	tar -cvzf $(PACKAGE_RPI).tar.gz -C $(BUILD_DIR) $(BINARY_NAME)
+	tar -cvzf $(PACKAGE_RPI).tar.gz -C $(BUILD_DIR) $(PACKAGE_RPI)
 
 build-rpi:
-	GOOS=linux GOARCH=arm GOARM=6 $(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME) -i $(BUILD_SRC)
+	GOOS=linux GOARCH=arm GOARM=6 $(GOBUILD) -o $(BUILD_DIR)/$(PACKAGE_RPI)/usr/bin/candump -i cmd/candump.go
