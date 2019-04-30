@@ -2,10 +2,11 @@ package can
 
 import (
 	"fmt"
-	"golang.org/x/sys/unix"
 	"net"
 	"os"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
@@ -17,5 +18,5 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 
 	f := os.NewFile(uintptr(s), fmt.Sprintf("fd %d", s))
 
-	return &readWriteCloser{f}, nil
+	return &readWriteCloser{rwc: f, socket: s}, nil
 }
