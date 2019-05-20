@@ -6,5 +6,5 @@ import (
 )
 
 func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
-	return nil, fmt.Errorf("Binding to can interface no supported on Darwin")
+	return nil, fmt.Errorf("Binding to can interface no supported on Windows")
 }
