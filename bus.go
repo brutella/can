@@ -84,8 +84,7 @@ func (b *Bus) Publish(frame Frame) error {
 	return b.rwc.WriteFrame(frame)
 }
 
-// SetFilter set's can filter on kernel level. This has the advantage that the application
-// is doesn't need to receive all frames to filter the intresting out.
+// SetFilter sets CAN filter on kernel level.
 func (b *Bus) SetFilter(filter []unix.CanFilter) error {
 	return b.rwc.setFilter(filter)
 }
