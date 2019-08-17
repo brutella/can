@@ -40,7 +40,6 @@ There is more to learn from the [documentation](http://godoc.org/github.com/site
 
 # License
 
-The orignal work is done by [brutella](https://github.com/brutella). This project is a fork of [https://github.com/brutella/can]
-(https://github.com/brutella/can).
+The orignal work is done by [brutella](https://github.com/brutella). This project is a fork of https://github.com/brutella/can
 
 *can* is available under the MIT license. See the LICENSE file for more info.
