@@ -1,12 +1,8 @@
 # can
 
-# Origin
-
-The project was originally created by [brutella](https://github.com/brutella).
-
 *can* provides an interface to a [CAN bus](https://www.kernel.org/doc/Documentation/networking/can.txt) to read and write frames. The library is based on the [SocketCAN](https://github.com/torvalds/linux/blob/097f70b3c4d84ffccca15195bdfde3a37c0a7c0f/include/uapi/linux/can.h) network stack on Linux.
 
-##Usage
+# Usage
 
 ## Setup the CAN bus
 
@@ -43,5 +39,8 @@ func handleCANFrame(frm can.Frame) {
 There is more to learn from the [documentation](http://godoc.org/github.com/sitec-systems/can).
 
 # License
+
+The orignal work is done by [brutella](https://github.com/brutella). This project is a fork of [https://github.com/brutella/can]
+(https://github.com/brutella/can).
 
 *can* is available under the MIT license. See the LICENSE file for more info.
