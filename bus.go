@@ -3,6 +3,8 @@ package can
 import (
 	"io"
 	"net"
+
+	"golang.org/x/sys/unix"
 )
 
 // Bus represents the CAN bus.
@@ -80,6 +82,16 @@ func (b *Bus) Unsubscribe(handler Handler) {
 // Frames publishes with the Publish methods are not received by handlers.
 func (b *Bus) Publish(frame Frame) error {
 	return b.rwc.WriteFrame(frame)
+}
+
+// SetFilter sets CAN filter on kernel level.
+func (b *Bus) SetFilter(filter []unix.CanFilter) error {
+	return b.rwc.setFilter(filter)
+}
+
+// DeleteFilter deltes all kernel filter.
+func (b *Bus) DeleteFilter() error {
+	return b.rwc.deleteFilter()
 }
 
 func (b *Bus) contains(handler Handler) bool {

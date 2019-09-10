@@ -6,14 +6,17 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/brutella/can"
 	"log"
 	"net"
 	"os"
 	"os/signal"
+
+	"github.com/sitec-systems/can"
+	"golang.org/x/sys/unix"
 )
 
 var i = flag.String("if", "", "network interface name")
+var filterFlag = flag.Int("filter", 0, "filter for id")
 
 func main() {
 	flag.Parse()
@@ -35,6 +38,18 @@ func main() {
 	}
 
 	bus := can.NewBus(conn)
+
+	if *filterFlag != 0 {
+		filter := make([]unix.CanFilter, 1)
+		filter[0].Id = uint32(*filterFlag)
+		filter[0].Mask = 0x7ff
+		err := bus.SetFilter(filter)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Can't set kernel filter: %s/n", err.Error())
+			os.Exit(1)
+		}
+	}
+
 	bus.SubscribeFunc(logCANFrame)
 
 	c := make(chan os.Signal)

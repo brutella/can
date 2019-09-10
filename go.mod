@@ -1,3 +1,5 @@
-module github.com/brutella/can
+module github.com/sitec-systems/can
 
-require golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06
+go 1.12
+
+require golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a
