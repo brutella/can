@@ -75,6 +75,10 @@ func (b *Bus) Unsubscribe(handler Handler) {
 	}
 }
 
+func (b *Bus) HasSubscriber() bool {
+	return len(b.handler) > 0
+}
+
 // Publish publishes a frame on the bus.
 //
 // Frames publishes with the Publish methods are not received by handlers.

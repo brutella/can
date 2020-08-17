@@ -75,3 +75,23 @@ func TestUnsubscribe(t *testing.T) {
 		t.Fatal(x)
 	}
 }
+
+func TestHasHandler(t *testing.T) {
+	rwc := NewEchoReadWriteCloser()
+	bus := NewBus(rwc)
+
+	if bus.HasSubscriber() != false {
+		t.Fatal("bus should not have subscriber on creation")
+	}
+
+	handler := newTestHandler()
+	bus.Subscribe(handler)
+	if bus.HasSubscriber() != true {
+		t.Fatal("bus should have subscriber after subscription")
+	}
+
+	bus.Unsubscribe(handler)
+	if bus.HasSubscriber() != false {
+		t.Fatal("bus should not have subscriber after subscriber unsubscribed")
+	}
+}
