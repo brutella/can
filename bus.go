@@ -45,8 +45,6 @@ func (b *Bus) ConnectAndPublish() error {
 			return err
 		}
 	}
-
-	return nil
 }
 
 // Disconnect stops handling CAN frames.
