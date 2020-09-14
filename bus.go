@@ -11,7 +11,8 @@ import (
 type Bus struct {
 	rwc ReadWriteCloser
 
-	handler []Handler
+	handler    []Handler
+	disconnect chan bool
 }
 
 // NewBusForInterfaceWithName returns a bus from the network interface with name ifaceName.
@@ -32,25 +33,30 @@ func NewBusForInterfaceWithName(ifaceName string) (*Bus, error) {
 // NewBus returns a new CAN bus.
 func NewBus(rwc ReadWriteCloser) *Bus {
 	return &Bus{
-		rwc:     rwc,
-		handler: make([]Handler, 0),
+		rwc:        rwc,
+		handler:    make([]Handler, 0),
+		disconnect: make(chan bool, 1),
 	}
 }
 
 // ConnectAndPublish starts handling CAN frames to publish them to handlers.
 func (b *Bus) ConnectAndPublish() error {
 	for {
-		err := b.publishNextFrame()
-		if err != nil {
-			return err
+		select {
+		case <-b.disconnect:
+			return nil
+		default:
+			err := b.publishNextFrame()
+			if err != nil {
+				return err
+			}
 		}
 	}
-
-	return nil
 }
 
 // Disconnect stops handling CAN frames.
 func (b *Bus) Disconnect() error {
+	b.disconnect <- true
 	return b.rwc.Close()
 }
 
@@ -73,6 +79,10 @@ func (b *Bus) Unsubscribe(handler Handler) {
 			return
 		}
 	}
+}
+
+func (b *Bus) HasSubscriber() bool {
+	return len(b.handler) > 0
 }
 
 // Publish publishes a frame on the bus.

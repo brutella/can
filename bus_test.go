@@ -75,3 +75,66 @@ func TestUnsubscribe(t *testing.T) {
 		t.Fatal(x)
 	}
 }
+
+func TestHasHandler(t *testing.T) {
+	rwc := NewEchoReadWriteCloser()
+	bus := NewBus(rwc)
+
+	if bus.HasSubscriber() != false {
+		t.Fatal("bus should not have subscriber on creation")
+	}
+
+	handler := newTestHandler()
+	bus.Subscribe(handler)
+	if bus.HasSubscriber() != true {
+		t.Fatal("bus should have subscriber after subscription")
+	}
+
+	bus.Unsubscribe(handler)
+	if bus.HasSubscriber() != false {
+		t.Fatal("bus should not have subscriber after subscriber unsubscribed")
+	}
+}
+
+func TestDisconnect(t *testing.T) {
+	rwc := NewEchoReadWriteCloser()
+	bus := NewBus(rwc)
+
+	connectAndPublishReturns := make(chan bool)
+
+	go func() {
+		bus.ConnectAndPublish()
+		connectAndPublishReturns <- true
+	}()
+	//Should make ConnectAndPublish return
+	bus.Disconnect()
+	// if it doesn't we're stuck on 1
+	timeout := time.After(100 * time.Millisecond)
+	select {
+	case <-timeout:
+		t.Fatal("bus.Disconnect does not abort ConnectAndPublish loop")
+	case <-connectAndPublishReturns:
+		//Success
+		return
+	}
+}
+
+func TestDisconnectWhenConnectAndPublishedNotCalled(t *testing.T) {
+	rwc := NewEchoReadWriteCloser()
+	bus := NewBus(rwc)
+
+	disconnected := make(chan bool)
+
+	go func() {
+		bus.Disconnect()
+		disconnected <- true
+	}()
+
+	timeout := time.After(100 * time.Millisecond)
+	select {
+	case <-timeout:
+		t.Fatal("bus.Disconnect() blocks when bus.ConnectAndPublish() not called")
+	case <-disconnected:
+		return
+	}
+}
