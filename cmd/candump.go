@@ -6,11 +6,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/brutella/can"
 	"log"
 	"net"
 	"os"
 	"os/signal"
+
+	"github.com/dockstavarvet/can"
 )
 
 var i = flag.String("if", "", "network interface name")
