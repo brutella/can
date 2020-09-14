@@ -95,3 +95,26 @@ func TestHasHandler(t *testing.T) {
 		t.Fatal("bus should not have subscriber after subscriber unsubscribed")
 	}
 }
+
+func TestDisconnect(t *testing.T) {
+	rwc := NewEchoReadWriteCloser()
+	bus := NewBus(rwc)
+
+	connectAndPublishReturns := make(chan bool)
+
+	go func() {
+		bus.ConnectAndPublish()
+		connectAndPublishReturns <- true
+	}()
+	//Should make ConnectAndPublish return
+	bus.Disconnect()
+	// if it doesn't we're stuck on 1
+	timeout := time.After(100 * time.Millisecond)
+	select {
+	case <-timeout:
+		t.Fatal("bus.Disconnect does not abort ConnectAndPublish loop")
+	case <-connectAndPublishReturns:
+		//Success
+		return
+	}
+}
