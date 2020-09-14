@@ -118,3 +118,23 @@ func TestDisconnect(t *testing.T) {
 		return
 	}
 }
+
+func TestDisconnectWhenConnectAndPublishedNotCalled(t *testing.T) {
+	rwc := NewEchoReadWriteCloser()
+	bus := NewBus(rwc)
+
+	disconnected := make(chan bool)
+
+	go func() {
+		bus.Disconnect()
+		disconnected <- true
+	}()
+
+	timeout := time.After(100 * time.Millisecond)
+	select {
+	case <-timeout:
+		t.Fatal("bus.Disconnect() blocks when bus.ConnectAndPublish() not called")
+	case <-disconnected:
+		return
+	}
+}

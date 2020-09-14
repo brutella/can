@@ -35,7 +35,7 @@ func NewBus(rwc ReadWriteCloser) *Bus {
 	return &Bus{
 		rwc:        rwc,
 		handler:    make([]Handler, 0),
-		disconnect: make(chan bool),
+		disconnect: make(chan bool, 1),
 	}
 }
 
