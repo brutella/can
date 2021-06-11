@@ -32,7 +32,7 @@ You should test if you actually receive data from the CAN bus. You can either us
 
 Either way you will see something like this
 
-    > go run $GOSRC/github.com/brutella/can/cmd/candump.go -if can0
+    > go run $GOSRC/github.com/FabianPetersen/can/cmd/candump.go -if can0
     
     can0 100  [6] 20 83 0C 00 67 29        ' ...g)'
     can0 701  [1] 05                       '.'
@@ -71,7 +71,7 @@ func handleCANFrame(frm can.Frame) {
 }
 ```
 
-There is more to learn from the [documentation](http://godoc.org/github.com/brutella/can).
+There is more to learn from the [documentation](http://godoc.org/github.com/FabianPetersen/can).
 
 # Contact
 

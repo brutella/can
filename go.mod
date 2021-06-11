@@ -1,4 +1,4 @@
-module github.com/brutella/can
+module github.com/FabianPetersen/can
 
 go 1.14
 

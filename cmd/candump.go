@@ -11,7 +11,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/brutella/can"
+	"github.com/FabianPetersen/can"
 	"golang.org/x/sys/unix"
 )
 
