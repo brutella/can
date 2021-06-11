@@ -17,5 +17,5 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 
 	f := os.NewFile(uintptr(s), fmt.Sprintf("fd %d", s))
 
-	return &readWriteCloser{f}, nil
+	return &readWriteCloser{rwc: f, socket: s}, nil
 }
