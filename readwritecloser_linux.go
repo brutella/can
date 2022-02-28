@@ -1,8 +1,10 @@
 package can
 
 import (
+	"fmt"
 	"golang.org/x/sys/unix"
 	"net"
+	"os"
 	"syscall"
 )
 
