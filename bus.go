@@ -11,7 +11,8 @@ import (
 // Handlers can subscribe to receive frames.
 // Frame are sent using the *Publish* method.
 type Bus struct {
-	rwc ReadWriteCloser
+	ifaceName string
+	rwc       ReadWriteCloser
 
 	handler []Handler
 }
@@ -28,14 +29,15 @@ func NewBusForInterfaceWithName(ifaceName string) (*Bus, error) {
 		return nil, err
 	}
 
-	return NewBus(conn), nil
+	return NewBus(conn, ifaceName), nil
 }
 
 // NewBus returns a new CAN bus.
-func NewBus(rwc ReadWriteCloser) *Bus {
+func NewBus(rwc ReadWriteCloser, ifaceName string) *Bus {
 	return &Bus{
-		rwc:     rwc,
-		handler: make([]Handler, 0),
+		rwc:       rwc,
+		ifaceName: ifaceName,
+		handler:   make([]Handler, 0),
 	}
 }
 
@@ -48,6 +50,21 @@ func (b *Bus) ConnectAndPublish() error {
 		}
 	}
 
+	return nil
+}
+
+func (b *Bus) Reconnect() error {
+	iface, err := net.InterfaceByName(b.ifaceName)
+	if err != nil {
+		return err
+	}
+
+	conn, err := NewReadWriteCloserForInterface(iface)
+	if err != nil {
+		return err
+	}
+
+	b.rwc = conn
 	return nil
 }
 

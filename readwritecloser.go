@@ -43,7 +43,7 @@ func NewReadWriteCloser(rwc io.ReadWriteCloser) ReadWriteCloser {
 }
 
 func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
-	b := make([]byte, 256) // TODO(brutella) optimize size
+	b := make([]byte, 16) // TODO(brutella) optimize size
 	n, err := rwc.Read(b)
 
 	if err != nil {

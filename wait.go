@@ -35,6 +35,7 @@ func Wait(bus *Bus, id uint32, timeout time.Duration) <-chan WaitResponse {
 			ch <- resp
 		case <-time.After(timeout):
 			err := fmt.Errorf("Timeout error waiting for %X", id)
+			bus.Unsubscribe(waiter.filter)
 			ch <- WaitResponse{Frame{}, err}
 		}
 	}()
