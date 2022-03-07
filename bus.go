@@ -3,6 +3,7 @@ package can
 import (
 	"io"
 	"net"
+	"sync"
 
 	"golang.org/x/sys/unix"
 )
@@ -15,6 +16,7 @@ type Bus struct {
 	rwc       ReadWriteCloser
 
 	handler []Handler
+	lock    sync.Mutex
 }
 
 // NewBusForInterfaceWithName returns a bus from the network interface with name ifaceName.
@@ -75,6 +77,8 @@ func (b *Bus) Disconnect() error {
 
 // Subscribe adds a handler to the bus.
 func (b *Bus) Subscribe(handler Handler) {
+	b.lock.Lock()
+	defer b.lock.Unlock()
 	b.handler = append(b.handler, handler)
 }
 
@@ -86,6 +90,9 @@ func (b *Bus) SubscribeFunc(fn HandlerFunc) {
 
 // Unsubscribe removes a handler.
 func (b *Bus) Unsubscribe(handler Handler) {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
 	for i, h := range b.handler {
 		if h == handler {
 			b.handler = append(b.handler[:i], b.handler[i+1:]...)
@@ -113,6 +120,9 @@ func (b *Bus) DeleteFilter() error {
 }
 
 func (b *Bus) contains(handler Handler) bool {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
 	for _, h := range b.handler {
 		if h == handler {
 			return true
