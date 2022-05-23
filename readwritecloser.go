@@ -3,8 +3,6 @@ package can
 import (
 	"errors"
 	"io"
-
-	"golang.org/x/sys/unix"
 )
 
 // The Reader interface extends the `io.Reader` interface by method
@@ -28,7 +26,7 @@ type ReadWriteCloser interface {
 	Writer
 
 	io.Closer
-	setFilter(filter []unix.CanFilter) error
+	setFilter(allowedIds []uint32) error
 	deleteFilter() error
 }
 
@@ -88,17 +86,3 @@ const (
 // ErrorKernelFilterNotSupported is returned if the socket attribute is 0. Then the method
 // setsockopt can't be called.
 var ErrorKernelFilterNotSupported = errors.New("Not possible to set kernel filter.")
-
-func (rwc *readWriteCloser) setFilter(filter []unix.CanFilter) error {
-	if rwc.socket == 0 {
-		return ErrorKernelFilterNotSupported
-	}
-	return unix.SetsockoptCanRawFilter(rwc.socket, solCANRaw, canRawFilter, filter)
-}
-
-func (rwc *readWriteCloser) deleteFilter() error {
-	if rwc.socket == 0 {
-		return ErrorKernelFilterNotSupported
-	}
-	return unix.SetsockoptCanRawFilter(rwc.socket, solCANRaw, canRawFilter, nil)
-}

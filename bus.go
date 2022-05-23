@@ -4,8 +4,6 @@ import (
 	"io"
 	"net"
 	"sync"
-
-	"golang.org/x/sys/unix"
 )
 
 // Bus represents the CAN bus.
@@ -110,8 +108,8 @@ func (b *Bus) Publish(frame Frame) error {
 
 // SetFilter set's can filter on kernel level. This has the advantage that the application
 // is doesn't need to receive all frames to filter the intresting out.
-func (b *Bus) SetFilter(filter []unix.CanFilter) error {
-	return b.rwc.setFilter(filter)
+func (b *Bus) SetFilter(allowedIds []uint32) error {
+	return b.rwc.setFilter(allowedIds)
 }
 
 // DeleteFilter deltes all kernel filter.
