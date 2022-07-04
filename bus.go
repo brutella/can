@@ -101,9 +101,16 @@ func (b *Bus) Unsubscribe(handler Handler) {
 
 // Publish publishes a frame on the bus.
 //
-// Frames publishes with the Publish methods are not received by handlers.
+// Frames published with the Publish methods are not received by handlers.
 func (b *Bus) Publish(frame Frame) error {
 	return b.rwc.WriteFrame(frame)
+}
+
+// PublishLocal publishes a frame to handlers
+//
+// Frames published with the PublishLocal method are ONLY received by handlers.
+func (b *Bus) PublishLocal(frame Frame) {
+	b.publish(frame)
 }
 
 // SetFilter set's can filter on kernel level. This has the advantage that the application
