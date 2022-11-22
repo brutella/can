@@ -26,7 +26,8 @@ type ReadWriteCloser interface {
 	Writer
 
 	io.Closer
-	setFilter(allowedIds []uint32) error
+	setPassFilter(allowedIds []uint32) error
+	setBlockFilter(disallowedIds []uint32) error
 	deleteFilter() error
 }
 
@@ -78,11 +79,7 @@ func (rwc *readWriteCloser) Close() error {
 	return rwc.rwc.Close()
 }
 
-const (
-	solCANRaw    = 101 // filter level for setsockopt call
-	canRawFilter = 1   // filter option for setsockopt call
-)
-
 // ErrorKernelFilterNotSupported is returned if the socket attribute is 0. Then the method
 // setsockopt can't be called.
-var ErrorKernelFilterNotSupported = errors.New("Not possible to set kernel filter.")
+var ErrorKernelFilterNotSupported = errors.New("not possible to set kernel filter")
+var ErrorKernelFilterTooMany = errors.New("too many kernel filters")

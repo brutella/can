@@ -9,6 +9,8 @@ import (
 )
 
 const maskCobID = 0x7FF
+const CAN_INV_FILTER = 0x20000000 /* to be set in can_filter.can_id */
+const CAN_RAW_FILTER_MAX = 512    /* maximum number of can_filter set via setsockopt() */
 
 func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 	s, _ := syscall.Socket(syscall.AF_CAN, syscall.SOCK_RAW, unix.CAN_RAW)
@@ -22,9 +24,13 @@ func NewReadWriteCloserForInterface(i *net.Interface) (ReadWriteCloser, error) {
 	return &readWriteCloser{rwc: f, socket: s}, nil
 }
 
-func (rwc *readWriteCloser) setFilter(allowedIds []uint32) error {
+func (rwc *readWriteCloser) setPassFilter(allowedIds []uint32) error {
 	if rwc.socket == 0 {
 		return ErrorKernelFilterNotSupported
+	}
+
+	if len(disallowedIds) >= CAN_RAW_FILTER_MAX {
+		return ErrorKernelFilterTooMany
 	}
 
 	filter := make([]unix.CanFilter, len(allowedIds))
@@ -34,12 +40,31 @@ func (rwc *readWriteCloser) setFilter(allowedIds []uint32) error {
 		filter[i].Mask = maskCobID
 	}
 
-	return unix.SetsockoptCanRawFilter(rwc.socket, solCANRaw, canRawFilter, filter)
+	return unix.SetsockoptCanRawFilter(rwc.socket, unix.SOL_CAN_RAW, unix.CAN_RAW_FILTER, filter)
+}
+
+func (rwc *readWriteCloser) setBlockFilter(disallowedIds []uint32) error {
+	if rwc.socket == 0 {
+		return ErrorKernelFilterNotSupported
+	}
+
+	if len(disallowedIds) >= CAN_RAW_FILTER_MAX {
+		return ErrorKernelFilterTooMany
+	}
+
+	filter := make([]unix.CanFilter, len(disallowedIds))
+
+	for i, disallowedId := range disallowedIds {
+		filter[i].Id = disallowedId | unix.CAN_INV_FILTER
+		filter[i].Mask = maskCobID
+	}
+
+	return unix.SetsockoptCanRawFilter(rwc.socket, unix.SOL_CAN_RAW, unix.CAN_RAW_JOIN_FILTER, filter)
 }
 
 func (rwc *readWriteCloser) deleteFilter() error {
 	if rwc.socket == 0 {
 		return ErrorKernelFilterNotSupported
 	}
-	return unix.SetsockoptCanRawFilter(rwc.socket, solCANRaw, canRawFilter, nil)
+	return unix.SetsockoptCanRawFilter(rwc.socket, unix.SOL_CAN_RAW, unix.CAN, nil)
 }

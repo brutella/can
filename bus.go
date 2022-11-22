@@ -114,9 +114,15 @@ func (b *Bus) PublishLocal(frame Frame) {
 }
 
 // SetFilter set's can filter on kernel level. This has the advantage that the application
-// is doesn't need to receive all frames to filter the intresting out.
-func (b *Bus) SetFilter(allowedIds []uint32) error {
-	return b.rwc.setFilter(allowedIds)
+// is doesn't need to receive all frames to filter the interesting out.
+func (b *Bus) SetPassFilter(allowedIds []uint32) error {
+	return b.rwc.setPassFilter(allowedIds)
+}
+
+// SetFilter set's can filter on kernel level. This has the advantage that the application
+// is doesn't need to receive all frames to filter the interesting out.
+func (b *Bus) SetBlockFilter(diallowedIds []uint32) error {
+	return b.rwc.setBlockFilter(diallowedIds)
 }
 
 // DeleteFilter deltes all kernel filter.
