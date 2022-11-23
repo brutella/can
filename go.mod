@@ -1,5 +1,5 @@
 module github.com/FabianPetersen/can
 
-go 1.14
+go 1.16
 
-require golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872
+require golang.org/x/sys v0.2.0
