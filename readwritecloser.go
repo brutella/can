@@ -3,6 +3,7 @@ package can
 import (
 	"errors"
 	"io"
+	"time"
 )
 
 // The Reader interface extends the `io.Reader` interface by method
@@ -16,7 +17,7 @@ type Reader interface {
 // to write a frame.
 type Writer interface {
 	io.Writer
-	WriteFrame(Frame) error
+	WriteFrame(Frame, time.Duration) error
 }
 
 // The ReadWriteCloser interface combines the Reader and Writer and
@@ -54,7 +55,8 @@ func (rwc *readWriteCloser) ReadFrame(frame *Frame) error {
 	return err
 }
 
-func (rwc *readWriteCloser) WriteFrame(frame Frame) error {
+func (rwc *readWriteCloser) WriteFrame(frame Frame, min time.Duration) error {
+	start := time.Now()
 	b, err := Marshal(frame)
 
 	if err != nil {
@@ -62,6 +64,11 @@ func (rwc *readWriteCloser) WriteFrame(frame Frame) error {
 	}
 
 	_, err = rwc.Write(b)
+
+	duration := time.Since(start)
+	if duration < min {
+		time.Sleep(min - duration)
+	}
 
 	return err
 }

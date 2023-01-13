@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 )
 
 // Bus represents the CAN bus.
@@ -103,7 +104,11 @@ func (b *Bus) Unsubscribe(handler Handler) {
 //
 // Frames published with the Publish methods are not received by handlers.
 func (b *Bus) Publish(frame Frame) error {
-	return b.rwc.WriteFrame(frame)
+	return b.PublishMinDuration(frame, 10*time.Millisecond)
+}
+
+func (b *Bus) PublishMinDuration(frame Frame, min time.Duration) error {
+	return b.rwc.WriteFrame(frame, min)
 }
 
 // PublishLocal publishes a frame to handlers
