@@ -5,6 +5,13 @@ import (
 	"encoding/binary"
 )
 
+const (
+	// MaxFrameDataLength defines the max length of a CAN data frame defined in ISO 11898-1.
+	MaxFrameDataLength = 8
+	// MaxExtFrameDataLength defines the max length of an CAN extended data frame defined in ISO ISO 11898-7.
+	MaxExtFrameDataLength = 64
+)
+
 // Frame represents a standard CAN data frame
 type Frame struct {
 	// bit 0-28: CAN identifier (11/29 bit)

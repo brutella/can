@@ -46,11 +46,6 @@ func (rwc *readWriteCloser) setBlockFilter(disallowedIds []uint32) error {
 		return ErrorKernelFilterNotSupported
 	}
 
-	// Since unix.CAN_RAW_JOIN_FILTER is not supported in this version, only one filter is allowed
-	if len(disallowedIds) >= 2 {
-		return ErrorKernelFilterTooMany
-	}
-
 	filter := make([]unix.CanFilter, len(disallowedIds))
 
 	for i, disallowedId := range disallowedIds {
@@ -58,7 +53,7 @@ func (rwc *readWriteCloser) setBlockFilter(disallowedIds []uint32) error {
 		filter[i].Mask = unix.CAN_SFF_MASK
 	}
 
-	return unix.SetsockoptCanRawFilter(rwc.socket, unix.SOL_CAN_RAW, unix.CAN_RAW_FILTER, filter)
+	return unix.SetsockoptCanRawFilter(rwc.socket, unix.SOL_CAN_RAW, unix.CAN_RAW_JOIN_FILTER, filter)
 }
 
 func (rwc *readWriteCloser) deleteFilter() error {
